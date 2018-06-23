@@ -82,7 +82,7 @@ async function loop(client: any, config: Config, st: State, db: influx.InfluxDB 
                     type:light.type,
                     name:light.name,
                     on: light.on?1:0,
-                    reachable: light.on?1:0
+                    reachable: light.reachable?1:0
                 }
             }])
         }

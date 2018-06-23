@@ -8,6 +8,7 @@ interface Config {
     bridgeIp?: string;
     lightThres: number;
     roomName: string;
+    handleLights:boolean;
     influx?: {
         host: string;
         database: string;
@@ -26,147 +27,68 @@ function timeout(time: number): Promise<void> {
     });
 }
 
-async function handleLight(client: any, light: any, st: State, config: Config, presence: boolean, lightLevel: number) {
-    const now = moment();
-    const hour = now.hours();
 
-    const isOn = light.on;
-
-    if (isOn) { // light is currently on
-        if (st.lastPresence) {
-            const hoursSince = now.diff(st.lastPresence, 'hours');
-            if (hoursSince < 2 && lightLevel > config.lightThres) {
-                console.log("Recent presence, but too much light! Dimming...");
-
-                if (light.brightness > 10) {
-                    light.brightness = Math.max(light.brightness - 10, 0);
-                } else {
-                    light.on = false;
-                }
-                await client.lights.save(light);
-                return;
-            }
-
-            if ((hour >= 22 || hour < 9) && hoursSince >= 2) {
-                console.log("It's the middle of the night, and there's nobody around since "
-                    + hoursSince + " hours.");
-                light.on = false;
-                await client.lights.save(light);
-                return;
-            }
-
-            if (hoursSince >= 5) {
-                console.log("The light's on for more than 5 hours, an nobody is here. Shit.");
-                light.on = false;
-                await client.lights.save(light);
-                return;
-            }
-        } else {
-            console.log("Light is on, but there's no sign of any presence!");
-            light.on = false;
-            await client.lights.save(light);
-            return;
-        }
-
-        if (lightLevel < config.lightThres * 0.8) {
-            console.log("It's too dark, making it brighter!");
-            if (light.brightness < 254) {
-                light.brightness = Math.min(254, light.brightness + 10);
-                await client.lights.save(light);
-            }
-            return;
-        }
-    } else { // light is currently off
-        if (presence && lightLevel < config.lightThres) {
-            console.log("Would turn it on, presence and not enough light ("
-                + lightLevel + " < " + config.lightThres + ")");
-
-            if (hour >= 22 || hour < 9) {
-                console.log("But not doing it, as it's past 22 and before 9!");
-            } else if (hour >= 9 && hour <= 11) {
-                console.log("Turning it on, in moring mode!");
-                light.on = true;
-                light.brightness = 100;
-
-                if (light.type === "Color light" || light.type === "Extended color light") {
-                    light.hue = 6000; // orange
-                    light.saturation = 254;
-                }
-            } else if (hour > 11 && hour < 18) {
-                console.log("Turning it on, in day mode");
-                light.on = true;
-                light.brightness = 254;
-
-                if (light.type === "Color light" || light.type === "Extended color light") {
-                    light.saturation = 0;
-                }
-            } else {
-                console.log("Turning it on, in night mode!");
-                light.on = true;
-                light.brightness = 254;
-
-                if (light.type === "Color light" || light.type === "Extended color light") {
-                    light.saturation = 0;
-                }
-            }
-            light.transitionTime = 5;
-            await client.lights.save(light);
-        }
-    }
-}
 
 async function loop(client: any, config: Config, st: State, db: influx.InfluxDB | null) {
     // let's find some sensors
-    let lightLevel: number = 0;
-    let presence: boolean | null = null;
-    let temp: number | null = null;
 
     const sensors = await client.sensors.getAll();
+    //console.log('sensors', sensors);
     for (const sensor of sensors) {
-        if (sensor.type === "ZLLLightLevel") {
-            lightLevel = sensor.state.attributes.attributes.lightlevel;
-        } else if (sensor.type === "ZLLPresence") {
-            presence = sensor.state.attributes.attributes.presence;
-        } else if (sensor.type === "ZLLTemperature") {
-            temp = sensor.state.attributes.attributes.temperature;
-        }
+      console.log('sensor', sensor.id);
+      console.log('name', sensor.name);
+      console.log('name', sensor.type);
+      console.log('presence', sensor.state.attributes.attributes.presence);
+      console.log('temperature', sensor.state.attributes.attributes.temperature);
+      console.log('lightlevel', sensor.state.attributes.attributes.lightlevel);
+      if (db) {
+          await db.writePoints([{
+              measurement: 'sensor',
+              tags: {
+                  sensor: sensor.name
+              },
+              fields: {
+                  type:sensor.type,
+                  name:sensor.name,
+                  presence: sensor.state.attributes.attributes.presence? 1 : 0,
+                  temperature: sensor.state.attributes.attributes.temperature||0,
+                  lightlevel: sensor.state.attributes.attributes.lightlevel||0
+              }
+          }])
+      }
+
+
     }
 
-    if (presence) {
-        st.lastPresence = moment();
-    }
 
-    console.log("LightLevel: " + lightLevel + ", Presence: " + presence + ", Temp: " + temp);
+
     console.log("Current hour: " + moment().hours());
 
     // let's find the lights
     const lights = await client.lights.getAll();
-    let lightsOn = 0;
+
     for (const light of lights) {
-        const isOn = light.on;
-        console.log(`Light ${light.id} ${light.name}. State: ${isOn} [${light.type}]`);
-        if (isOn) {
-            lightsOn += 1;
+        console.log('light', light.id);
+        console.log('name', light.name);
+        console.log('on', light.on);
+        console.log('reachable', light.reachable);
+        if (db) {
+            await db.writePoints([{
+                measurement: 'light',
+                tags: {
+                    light: light.name
+                },
+                fields: {
+                    type:light.type,
+                    name:light.name,
+                    on: light.on?1:0,
+                    reachable: light.on?1:0
+                }
+            }])
         }
-
-        await handleLight(client, light, st, config, presence || false, lightLevel);
     }
 
-    // write metrics
-    if (db) {
-        await db.writePoints([{
-            measurement: 'hue_info',
-            tags: {
-                room: config.roomName
-            },
-            fields: {
-                lights_on: lightsOn,
-                temperature: temp || 0,
-                light_level: lightLevel,
-                presence: presence || false
-            }
-        }])
-    }
+
 }
 
 async function main() {
@@ -197,7 +119,7 @@ async function main() {
         });
 
         const user = new cli.users.User;
-        user.deviceType = "Farbton";
+        user.deviceType = "Farbton-ts";
 
         const u = await cli.users.create(user);
         console.log("New user is: " + u.username);
@@ -225,13 +147,24 @@ async function main() {
             host: config.influx.host,
             database: config.influx.database,
             schema: [{
-                measurement: 'hue_info',
-                tags: ['room'],
+                measurement: 'light',
+                tags: ['light'],
                 fields: {
-                    lights_on: influx.FieldType.INTEGER,
+                    type:influx.FieldType.STRING,
+                    name:influx.FieldType.STRING,
+                    on: influx.FieldType.INTEGER,
+                    reachable: influx.FieldType.INTEGER
+
+                }
+            },{
+                measurement: 'sensor',
+                tags: ['sensor'],
+                fields: {
+                    type:influx.FieldType.STRING,
+                    name:influx.FieldType.STRING,
+                    presence: influx.FieldType.INTEGER,
                     temperature: influx.FieldType.FLOAT,
-                    light_level: influx.FieldType.INTEGER,
-                    presence: influx.FieldType.BOOLEAN
+                    lightlevel: influx.FieldType.INTEGER
                 }
             }]
         });
@@ -242,8 +175,14 @@ async function main() {
     };
 
     while (true) {
+      try{
         await loop(client, config, initState, db);
+
+      }catch (E){
+        console.log('E', E);
+      }finally{
         await timeout(1000);
+      }
     }
 }
 

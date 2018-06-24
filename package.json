@@ -7,12 +7,12 @@
     "farbton": "./build/main.js"
   },
   "scripts": {
-    "compile": "tsc -p .",
+    "start": "npm run lint && npm run compile && node build/main.js",
     "lint": "npx tslint -p tsconfig.json",
+    "compile": "tsc -p .",
     "test": "jest --no-cache",
     "coverage": "jest --no-cache --coverage && cat ./coverage/lcov.info | npx coveralls",
-    "cov":"jest --coverage --coverageReporters=text-lcov| coveralls"
-
+    "cov": "jest --coverage --coverageReporters=text-lcov| coveralls"
   },
   "repository": {
     "type": "git",
@@ -21,17 +21,19 @@
   "author": "Alexander Thiemann",
   "license": "MIT",
   "dependencies": {
-    "@types/node": "^6.0.49",
     "@types/jest": "21.1.2",
+    "@types/node": "^6.0.49",
     "huejay": "^1.5.0",
     "influx": "^5.0.7",
-    "moment": "^2.18.1"
+    "moment": "^2.18.1",
+    "tslint-sonarts": "^1.7.0"
   },
   "devDependencies": {
     "@types/core-js": "^0.9.35",
     "coveralls": "3.0.0",
     "jest": "^21.2.1",
     "tslint": "5.7.0",
+    "tslint-eslint-rules": "^5.3.1",
     "typescript": "2.4.2"
   },
   "jest": {

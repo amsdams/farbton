@@ -9,11 +9,11 @@ interface Config {
   influx?: {
     host: string;
     database: string;
-  }
+  };
 }
 
 interface State {
-  lastPresence: moment.Moment | null
+  lastPresence: moment.Moment | null;
 }
 
 function timeout(time: number): Promise<void> {
@@ -42,7 +42,7 @@ async function loop(client: any, config: Config, st: State, db: influx.InfluxDB 
       await db.writePoints([{
         measurement: 'sensor',
         tags: {
-          sensor: sensor.name
+          sensor: sensor.name;
         },
         fields: {
           type: sensor.type,
@@ -51,7 +51,7 @@ async function loop(client: any, config: Config, st: State, db: influx.InfluxDB 
           temperature: sensor.state.attributes.attributes.temperature || 0,
           lightlevel: sensor.state.attributes.attributes.lightlevel || 0
         }
-      }])
+      }]);
     }
 
 
@@ -59,7 +59,7 @@ async function loop(client: any, config: Config, st: State, db: influx.InfluxDB 
 
 
 
-  console.log("Current hour: " + moment().hours());
+  console.log('Current hour: ' + moment().hours());
 
   // let's find the lights
   const lights = await client.lights.getAll();
@@ -81,7 +81,7 @@ async function loop(client: any, config: Config, st: State, db: influx.InfluxDB 
           on: light.on ? 1 : 0,
           reachable: light.reachable ? 1 : 0
         }
-      }])
+      }]);
     }
   }
 
@@ -89,39 +89,39 @@ async function loop(client: any, config: Config, st: State, db: influx.InfluxDB 
 }
 
 async function main() {
-  const config: Config = JSON.parse(fs.readFileSync("config.json").toString());
+  const config: Config = JSON.parse(fs.readFileSync('config.json').toString());
 
   // find the bridge
   if (!config.bridgeIp) {
     const bridges = await huejay.discover();
     if (bridges.length === 0) {
-      throw new Error("No bridges found");
+      throw new Error('No bridges found');
     }
     for (const b of bridges) {
-      console.log(" + Found " + b.id + " at " + b.ip);
+      console.log(' + Found ' + b.id + ' at ' + b.ip);
     }
 
     const bridge = bridges[0];
-    console.log("Using bridge " + bridge.id + " at " + bridge.ip);
+    console.log('Using bridge ' + bridge.id + ' at ' + bridge.ip);
 
     config.bridgeIp = bridge.ip;
   }
 
   // get a new user if needed
   if (!config.username) {
-    console.log("No username provided, trying to register a new one");
+    console.log('No username provided, trying to register a new one');
 
     const cli = new huejay.Client({
       host: config.bridgeIp
     });
 
     const user = new cli.users.User;
-    user.deviceType = "Farbton-ts";
+    user.deviceType = 'Farbton-ts';
 
     const u = await cli.users.create(user);
-    console.log("New user is: " + u.username);
+    console.log('New user is: ' + u.username);
 
-    config.username = u.username
+    config.username = u.username;
   }
 
   // create the real client and check auth
@@ -130,16 +130,16 @@ async function main() {
     username: config.username
   });
 
-  console.log("Checking bridge auth ...");
+  console.log('Checking bridge auth ...');
   const authOk = await client.bridge.isAuthenticated();
   if (!authOk) {
-    console.log("Not authenticated.");
+    console.log('Not authenticated.');
     return;
   }
 
   let db: influx.InfluxDB | null = null;
   if (config.influx) {
-    console.log("InfluxDB is enabled");
+    console.log('InfluxDB is enabled');
     db = new influx.InfluxDB({
       host: config.influx.host,
       database: config.influx.database,

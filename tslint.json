@@ -1,0 +1,10 @@
+{
+    "rules": {
+      "semicolon": [true, "always"],
+      "curly": [true],
+      "quotemark": [true, "single", "jsx-double"],
+      "no-duplicate-variable": true,
+      "no-console": false,
+      "no-debugger": true
+    }
+  }

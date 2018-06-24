@@ -7,7 +7,11 @@
     "farbton": "./build/main.js"
   },
   "scripts": {
-    "compile": "tsc -p ."
+    "compile": "tsc -p .",
+    "lint": "npx tslint -p tsconfig.json",
+    "test": "jest --no-cache",
+    "coverage": "jest --no-cache --coverage && cat ./coverage/lcov.info | npx coveralls"
+
   },
   "repository": {
     "type": "git",
@@ -17,12 +21,19 @@
   "license": "MIT",
   "dependencies": {
     "@types/node": "^6.0.49",
+    "@types/jest": "21.1.2",
     "huejay": "^1.5.0",
     "influx": "^5.0.7",
     "moment": "^2.18.1"
   },
   "devDependencies": {
     "@types/core-js": "^0.9.35",
+    "coveralls": "3.0.0",
+    "jest": "^21.2.1",
+    "tslint": "5.7.0",
     "typescript": "2.4.2"
+  },
+  "jest": {
+    "verbose": true
   }
 }

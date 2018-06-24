@@ -10,7 +10,8 @@
     "compile": "tsc -p .",
     "lint": "npx tslint -p tsconfig.json",
     "test": "jest --no-cache",
-    "coverage": "jest --no-cache --coverage && cat ./coverage/lcov.info | npx coveralls"
+    "coverage": "jest --no-cache --coverage && cat ./coverage/lcov.info | npx coveralls",
+    "cov":"jest --coverage --coverageReporters=text-lcov| coveralls"
 
   },
   "repository": {

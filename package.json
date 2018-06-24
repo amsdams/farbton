@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "npm run lint && npm run compile && node build/main.js",
-    "lint": "npx tslint -p tsconfig.json",
+    "lint": "tslint -p tsconfig.json",
     "compile": "tsc -p .",
     "test": "jest --no-cache",
     "coverage": "jest --no-cache --coverage && cat ./coverage/lcov.info | npx coveralls",

@@ -42,7 +42,7 @@ async function loop(client: any, config: Config, st: State, db: influx.InfluxDB 
       await db.writePoints([{
         measurement: 'sensor',
         tags: {
-          sensor: sensor.name;
+          sensor: sensor.name
         },
         fields: {
           type: sensor.type,

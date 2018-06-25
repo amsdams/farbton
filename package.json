@@ -8,6 +8,8 @@
   },
   "scripts": {
     "start": "npm run lint && npm run compile && nyc -r lcovonly node build/main.js",
+    "run": "node build/main.js",
+    "debug": "node inspect build/main.js",
     "lint": "tslint -p tsconfig.json",
     "compile": "tsc -p .",
     "test": "jest --no-cache",

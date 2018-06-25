@@ -23,9 +23,13 @@ async function doLights(client: any, config: IConfig, db: influx.InfluxDB | null
   const lights = await client.lights.getAll();
 
   for (const light of lights) {
-    console.table( light.state.attributes.attributes);
-    console.table( light.config.attributes.attributes);
-    console.table( light.attributes.attributes);
+    try {
+      console.table( light.state.attributes);
+      console.table( light.attributes);
+    } catch (e) {
+      console.error(e);
+    }
+
     if (db) {
       await db.writePoints([{
         measurement: 'light',
@@ -46,10 +50,13 @@ async function doSensors(client: any, config: IConfig, db: influx.InfluxDB | nul
   const sensors = await client.sensors.getAll();
 
   for (const sensor of sensors) {
-
-    console.table( sensor.state.attributes.attributes);
-    console.table( sensor.config.attributes.attributes);
-    console.table( sensor.attributes.attributes);
+    try {
+      console.table( sensor.state.attributes);
+      console.table( sensor.config.attributes);
+      console.table( sensor.attributes);
+    } catch (e) {
+      console.error(e);
+    }
     if (db) {
       await db.writePoints([{
         measurement: 'sensor',

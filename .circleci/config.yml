@@ -1,4 +1,7 @@
 version: 2
+machine:
+  node:
+    version: 10.5.0
 jobs:
   build:
     working-directory: ~/farbton

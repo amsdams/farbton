@@ -1,5 +1,5 @@
 {
-  "name": "farbton",
+  "name": "farbton-fork",
   "version": "1.0.0",
   "description": "Philips Hue Magic",
   "main": "./build/main.js",
@@ -7,7 +7,7 @@
     "farbton": "./build/main.js"
   },
   "scripts": {
-    "start": "npm run lint && npm run compile && node build/main.js",
+    "start": "npm run lint && npm run compile && nyc -r lcovonly node build/main.js",
     "lint": "tslint -p tsconfig.json",
     "compile": "tsc -p .",
     "test": "jest --no-cache",
@@ -18,25 +18,27 @@
     "type": "git",
     "url": "https://github.com/amsdams/farbton"
   },
-  "author": "Alexander Thiemann",
+  "author": "amsdams",
   "license": "MIT",
   "dependencies": {
-    "@types/jest": "21.1.2",
-    "@types/node": "^6.0.49",
-    "huejay": "^1.5.0",
-    "influx": "^5.0.7",
-    "moment": "^2.18.1",
-    "tslint-sonarts": "^1.7.0"
+    "@types/jest": "latest",
+    "@types/node": "latest",
+    "huejay": "latest",
+    "influx": "latest",
+    "moment": "latest"
   },
   "devDependencies": {
-    "@types/core-js": "^0.9.35",
-    "coveralls": "3.0.0",
-    "jest": "^21.2.1",
-    "tslint": "5.7.0",
-    "tslint-eslint-rules": "^5.3.1",
-    "typescript": "2.4.2"
+    "@types/core-js": "latest",
+    "coveralls": "latest",
+    "jest": "^23.2.0",
+    "nyc": "^12.0.2",
+    "tslint": "latest",
+    "tslint-eslint-rules": "latest",
+    "tslint-sonarts": "latest",
+    "typescript": "latest"
   },
   "jest": {
     "verbose": true
   }
+
 }

@@ -11,8 +11,6 @@ not much is configurable and most is hardcoded to match my setup.
 {
     "username": "V5-XXX-XXX",
     "bridgeIp": "192.168.XXX.XXX",
-    "lightThres": 14800,
-    "roomName": "Alex",
     "influx": {
         "host": "localhost",
         "database": "hue"

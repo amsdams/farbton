@@ -23,10 +23,9 @@ async function doLights(client: any, config: IConfig, db: influx.InfluxDB | null
   const lights = await client.lights.getAll();
 
   for (const light of lights) {
-    console.log('light', light.id);
-    console.log('name', light.name);
-    console.log('on', light.on);
-    console.log('reachable', light.reachable);
+    console.table( light.state.attributes.attributes);
+    console.table( light.config.attributes.attributes);
+    console.table( light.attributes.attributes);
     if (db) {
       await db.writePoints([{
         measurement: 'light',
@@ -47,12 +46,10 @@ async function doSensors(client: any, config: IConfig, db: influx.InfluxDB | nul
   const sensors = await client.sensors.getAll();
 
   for (const sensor of sensors) {
-    console.log('sensor', sensor.id);
-    console.log('name', sensor.name);
-    console.log('name', sensor.type);
-    console.log('presence', sensor.state.attributes.attributes.presence);
-    console.log('temperature', sensor.state.attributes.attributes.temperature);
-    console.log('lightlevel', sensor.state.attributes.attributes.lightlevel);
+
+    console.table( sensor.state.attributes.attributes);
+    console.table( sensor.config.attributes.attributes);
+    console.table( sensor.attributes.attributes);
     if (db) {
       await db.writePoints([{
         measurement: 'sensor',
@@ -75,7 +72,7 @@ async function loop(client: any, config: IConfig, db: influx.InfluxDB | null) {
   // let's find some sensors
 
   doSensors(client, config, db);
-  console.log('Current hour: ' + moment().hours());
+  console.log('Current hour: ' + moment());
 
   // let's find the lights
   doLights(client, config, db);

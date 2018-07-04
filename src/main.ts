@@ -19,70 +19,79 @@ function timeout(time: number): Promise<void> {
     }, time);
   });
 }
-async function doLights(client: any, config: IConfig, db: influx.InfluxDB | null) {
+async function doLights(client: any, db: influx.InfluxDB | null) {
   const lights = await client.lights.getAll();
 
   for (const light of lights) {
     try {
-      console.table( light.state.attributes);
-      console.table( light.attributes);
+      console.log('light.attributes');
+      console.table(light.attributes);
+      console.log('light.state.attributes:');
+      console.table(light.state.attributes);
     } catch (e) {
       console.error(e);
     }
 
     if (db) {
-      await db.writePoints([{
-        measurement: 'light',
-        tags: {
-          light: light.name,
+      await db.writePoints([
+        {
+          measurement: 'light',
+          tags: {
+            light: light.name,
+          },
+          fields: {
+            type: light.type,
+            name: light.name,
+            on: light.on ? 1 : 0,
+            reachable: light.reachable ? 1 : 0,
+          },
         },
-        fields: {
-          type: light.type,
-          name: light.name,
-          on: light.on ? 1 : 0,
-          reachable: light.reachable ? 1 : 0,
-        },
-      }]);
+      ]);
     }
   }
 }
-async function doSensors(client: any, config: IConfig, db: influx.InfluxDB | null) {
+async function doSensors(client: any, db: influx.InfluxDB | null) {
   const sensors = await client.sensors.getAll();
 
   for (const sensor of sensors) {
     try {
-      console.table( sensor.state.attributes);
-      console.table( sensor.config.attributes);
-      console.table( sensor.attributes);
+      console.log('sensor.attributes:');
+      console.table(sensor.attributes);
+      console.log('sensor.state.attributes:');
+      console.table(sensor.state.attributes);
+      console.log('sensor.config.attributes:');
+      console.table(sensor.config.attributes);
     } catch (e) {
       console.error(e);
     }
     if (db) {
-      await db.writePoints([{
-        measurement: 'sensor',
-        tags: {
-          sensor: sensor.name,
+      await db.writePoints([
+        {
+          measurement: 'sensor',
+          tags: {
+            sensor: sensor.name,
+          },
+          fields: {
+            type: sensor.type,
+            name: sensor.name,
+            presence: sensor.state.attributes.attributes.presence ? 1 : 0,
+            temperature: sensor.state.attributes.attributes.temperature || 0,
+            lightlevel: sensor.state.attributes.attributes.lightlevel || 0,
+          },
         },
-        fields: {
-          type: sensor.type,
-          name: sensor.name,
-          presence: sensor.state.attributes.attributes.presence ? 1 : 0,
-          temperature: sensor.state.attributes.attributes.temperature || 0,
-          lightlevel: sensor.state.attributes.attributes.lightlevel || 0,
-        },
-      }]);
+      ]);
     }
   }
 }
 
-async function loop(client: any, config: IConfig, db: influx.InfluxDB | null) {
+async function loop(client: any, db: influx.InfluxDB | null) {
   // let's find some sensors
 
-  doSensors(client, config, db);
+  doSensors(client, db);
   console.log('Current hour: ' + moment());
 
   // let's find the lights
-  doLights(client, config, db);
+  doLights(client, db);
 }
 
 async function main() {
@@ -140,33 +149,35 @@ async function main() {
     db = new influx.InfluxDB({
       host: config.influx.host,
       database: config.influx.database,
-      schema: [{
-        measurement: 'light',
-        tags: ['light'],
-        fields: {
-          type: influx.FieldType.STRING,
-          name: influx.FieldType.STRING,
-          on: influx.FieldType.INTEGER,
-          reachable: influx.FieldType.INTEGER,
+      schema: [
+        {
+          measurement: 'light',
+          tags: ['light'],
+          fields: {
+            type: influx.FieldType.STRING,
+            name: influx.FieldType.STRING,
+            on: influx.FieldType.INTEGER,
+            reachable: influx.FieldType.INTEGER,
+          },
         },
-      }, {
-        measurement: 'sensor',
-        tags: ['sensor'],
-        fields: {
-          type: influx.FieldType.STRING,
-          name: influx.FieldType.STRING,
-          presence: influx.FieldType.INTEGER,
-          temperature: influx.FieldType.FLOAT,
-          lightlevel: influx.FieldType.INTEGER,
+        {
+          measurement: 'sensor',
+          tags: ['sensor'],
+          fields: {
+            type: influx.FieldType.STRING,
+            name: influx.FieldType.STRING,
+            presence: influx.FieldType.INTEGER,
+            temperature: influx.FieldType.FLOAT,
+            lightlevel: influx.FieldType.INTEGER,
+          },
         },
-      }],
+      ],
     });
   }
 
   while (true) {
     try {
-      await loop(client, config, db);
-
+      await loop(client, db);
     } catch (E) {
       console.log('E', E);
     } finally {

@@ -23,16 +23,16 @@
   "author": "amsdams",
   "license": "MIT",
   "dependencies": {
-    "@types/jest": "latest",
-    "@types/node": "latest",
+    "@types/jest": "^23.1.4",
+    "@types/node": "^10.5.2",
     "huejay": "latest",
     "influx": "latest",
     "moment": "latest"
   },
   "devDependencies": {
     "@types/core-js": "latest",
-    "coveralls": "latest",
-    "jest": "^23.2.0",
+    "coveralls": "^3.0.2",
+    "jest": "^23.3.0",
     "nyc": "^12.0.2",
     "tslint": "latest",
     "tslint-eslint-rules": "latest",
@@ -42,5 +42,4 @@
   "jest": {
     "verbose": true
   }
-
 }

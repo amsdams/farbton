@@ -5,5 +5,5 @@ install:
 - npm i
 script:
 - npm run compile
-script:
-  - npm test
+# script:
+#  - npm test

@@ -19,68 +19,74 @@ function timeout(time: number): Promise<void> {
     }, time);
   });
 }
+async function doLight(light: any, db: influx.InfluxDB | null) {
+  try {
+    console.log('light.attributes');
+    console.table(light.attributes);
+    console.log('light.state.attributes:');
+    console.table(light.state.attributes);
+  } catch (e) {
+    console.error(e);
+  }
+
+  if (db) {
+    await db.writePoints([
+      {
+        measurement: 'light',
+        tags: {
+          light: light.name,
+        },
+        fields: {
+          type: light.type,
+          name: light.name,
+          on: light.on ? 1 : 0,
+          reachable: light.reachable ? 1 : 0,
+        },
+      },
+    ]);
+  }
+}
 async function doLights(client: any, db: influx.InfluxDB | null) {
   const lights = await client.lights.getAll();
 
   for (const light of lights) {
-    try {
-      console.log('light.attributes');
-      console.table(light.attributes);
-      console.log('light.state.attributes:');
-      console.table(light.state.attributes);
-    } catch (e) {
-      console.error(e);
-    }
-
-    if (db) {
-      await db.writePoints([
-        {
-          measurement: 'light',
-          tags: {
-            light: light.name,
-          },
-          fields: {
-            type: light.type,
-            name: light.name,
-            on: light.on ? 1 : 0,
-            reachable: light.reachable ? 1 : 0,
-          },
+    await doLight(light, db);
+  }
+}
+async function doSensor(sensor: any, db: influx.InfluxDB | null) {
+  try {
+    console.log('sensor.attributes:');
+    console.table(sensor.attributes);
+    console.log('sensor.state.attributes:');
+    console.table(sensor.state.attributes);
+    console.log('sensor.config.attributes:');
+    console.table(sensor.config.attributes);
+  } catch (e) {
+    console.error(e);
+  }
+  if (db) {
+    await db.writePoints([
+      {
+        measurement: 'sensor',
+        tags: {
+          sensor: sensor.name,
         },
-      ]);
-    }
+        fields: {
+          type: sensor.type,
+          name: sensor.name,
+          presence: sensor.state.attributes.attributes.presence ? 1 : 0,
+          temperature: sensor.state.attributes.attributes.temperature || 0,
+          lightlevel: sensor.state.attributes.attributes.lightlevel || 0,
+        },
+      },
+    ]);
   }
 }
 async function doSensors(client: any, db: influx.InfluxDB | null) {
   const sensors = await client.sensors.getAll();
 
   for (const sensor of sensors) {
-    try {
-      console.log('sensor.attributes:');
-      console.table(sensor.attributes);
-      console.log('sensor.state.attributes:');
-      console.table(sensor.state.attributes);
-      console.log('sensor.config.attributes:');
-      console.table(sensor.config.attributes);
-    } catch (e) {
-      console.error(e);
-    }
-    if (db) {
-      await db.writePoints([
-        {
-          measurement: 'sensor',
-          tags: {
-            sensor: sensor.name,
-          },
-          fields: {
-            type: sensor.type,
-            name: sensor.name,
-            presence: sensor.state.attributes.attributes.presence ? 1 : 0,
-            temperature: sensor.state.attributes.attributes.temperature || 0,
-            lightlevel: sensor.state.attributes.attributes.lightlevel || 0,
-          },
-        },
-      ]);
-    }
+    await doSensor(sensor, db);
   }
 }
 

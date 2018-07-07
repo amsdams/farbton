@@ -8,6 +8,7 @@
 [![dependencies Status](https://david-dm.org/amsdams/farbton/status.svg)](https://david-dm.org/amsdams/farbton)
 [![Maintainability](https://api.codeclimate.com/v1/badges/af4d357616fb18f983f0/maintainability)](https://codeclimate.com/github/amsdams/farbton/maintainability)
 [![Known Vulnerabilities](https://snyk.io/test/github/amsdams/farbton/badge.svg?targetFile=package.json)](https://snyk.io/test/github/amsdams/farbton?targetFile=package.json)
+[![codebeat badge](https://codebeat.co/badges/2a824828-e0ca-46e5-b004-8f3007b88fd2)](https://codebeat.co/projects/github-com-amsdams-farbton-master)
 
 This is a small daemon written in TypeScript to control my Philips Hue setup. Note that currently
 not much is configurable and most is hardcoded to match my setup.

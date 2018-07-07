@@ -1,10 +1,10 @@
 language: node_js
 node_js:
-- "node"
 - 8.11.3
 install:
 - npm i
 script:
-- npm run compile
+- npm run-script lint
+- npm run-script compile
 # script:
 #  - npm test

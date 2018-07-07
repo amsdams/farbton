@@ -13,7 +13,7 @@ interface IConfig {
 }
 
 function timeout(time: number): Promise<void> {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve, /*reject*/_) => {
     setTimeout(() => {
       resolve();
     }, time);

@@ -3,7 +3,7 @@ jobs:
   build:
     working-directory: ~/farbton
     docker:
-      - image: circleci/node:10.6.0
+      - image: circleci/node:8.11.3
     steps:
       - checkout
       - restore_cache:

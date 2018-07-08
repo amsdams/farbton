@@ -1,0 +1,7 @@
+# .scrutinizer.yml
+
+checks:
+    javascript: true
+filter:
+    excluded_paths:
+        - node_modules/*

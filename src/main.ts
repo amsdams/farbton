@@ -42,8 +42,8 @@ async function printLight(light: any) {
     console.table(light.attributes);
     console.log('light.state.attributes:');
     console.table(light.state.attributes);
-  } catch (e) {
-    console.error(e);
+  } catch (err) {
+    console.error(err);
   }
 }
 async function doLight(light: any, db: influx.InfluxDB | null) {
@@ -85,8 +85,8 @@ async function printSensor(sensor: any) {
     console.table(sensor.state.attributes);
     console.log('sensor.config.attributes:');
     console.table(sensor.config.attributes);
-  } catch (e) {
-    console.error(e);
+  } catch (err) {
+    console.error(err);
   }
 }
 
@@ -216,8 +216,8 @@ async function main() {
   while (true) {
     try {
       await loop(client, db);
-    } catch (E) {
-      console.log('E', E);
+    } catch (err) {
+      console.error(err);
     } finally {
       await timeout(1000);
     }

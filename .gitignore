@@ -3,3 +3,6 @@ node_modules/
 sync.sh
 coverage
 config.json
+.scannerwork
+sonar.sh
+.alm

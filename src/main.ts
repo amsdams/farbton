@@ -154,7 +154,6 @@ async function getClient(config: any) {
   const authOk = await client.bridge.isAuthenticated();
   if (!authOk) {
     console.log('Not authenticated.');
-    return;
   }
   return client;
 }
@@ -164,11 +163,11 @@ async function getDefaultBridge() {
     throw new Error('No bridges found');
   }
   for (const b of bridges) {
-    console.log(' + Found ' + b.id + ' at ' + b.ip);
+    console.log(' + Found %s at %s', b.id, b.ip);
   }
 
   const bridge = bridges[0];
-  console.log('Using bridge ' + bridge.id + ' at ' + bridge.ip);
+  console.log('Using bridge %s at %s', bridge.id, bridge.ip);
   return bridge;
 }
 async function getDefaultUser(config: any) {
@@ -182,7 +181,7 @@ async function getDefaultUser(config: any) {
   user.deviceType = 'Farbton-ts';
 
   const u = await cli.users.create(user);
-  console.log('New user is: ' + u.username);
+  console.log('New user is: %s', u.username);
   return u;
 }
 

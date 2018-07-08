@@ -4,7 +4,7 @@
     "quotemark": [true, "single", "jsx-double"],
     "no-console": false,
     "no-big-function": [true, 25],
-    "cognitive-complexity": [true, 11]
-
+    "cognitive-complexity": [true, 11],
+    "prefer-template": [true, "allow-single-concat"]
   }
 }

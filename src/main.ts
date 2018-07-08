@@ -129,9 +129,7 @@ function setupInflux(config: any): influx.InfluxDB {
         },
         measurement: 'light',
         tags: ['light'],
-      },
-      {
-
+      }, {
         fields: {
           lightlevel: influx.FieldType.INTEGER,
           name: influx.FieldType.STRING,

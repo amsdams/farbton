@@ -13,14 +13,14 @@ interface IConfig {
 }
 
 function timeout(time: number): Promise<void> {
-  return new Promise((resolve, /*reject*/_) => {
+  return new Promise((resolve, /*reject*/ _) => {
     setTimeout(() => {
       resolve();
     }, time);
   });
 }
-async function saveLight(light: any, db: influx.InfluxDB) {
 
+async function saveLight(light: any, db: influx.InfluxDB) {
   await db.writePoints([
     {
       fields: {
@@ -74,7 +74,6 @@ async function saveSensor(sensor: any, db: influx.InfluxDB) {
       tags: {
         sensor: sensor.name,
       },
-
     },
   ]);
 }
@@ -129,7 +128,8 @@ function setupInflux(config: any): influx.InfluxDB {
         },
         measurement: 'light',
         tags: ['light'],
-      }, {
+      },
+      {
         fields: {
           lightlevel: influx.FieldType.INTEGER,
           name: influx.FieldType.STRING,
@@ -144,7 +144,7 @@ function setupInflux(config: any): influx.InfluxDB {
   });
 }
 /* tslint:enable:no-big-function */
-async function getRealClient(config: any) {
+async function getClient(config: any) {
   // create the real client and check auth
   const client = new huejay.Client({
     host: config.bridgeIp,
@@ -185,7 +185,16 @@ async function getDefaultUser(config: any) {
   console.log('New user is: ' + u.username);
   return u;
 }
-async function setClient(config: any) {
+
+function getDatabase(config: any) {
+  let db: influx.InfluxDB | null = null;
+  if (config.influx) {
+    console.log('InfluxDB is enabled');
+    db = setupInflux(config);
+  }
+  return db;
+}
+async function getClientConfig(config: any) {
   // find the bridge
   if (!config.bridgeIp) {
     const bridge = await getDefaultBridge();
@@ -200,14 +209,9 @@ async function setClient(config: any) {
 }
 async function main() {
   let config: IConfig = JSON.parse(fs.readFileSync('config.json').toString());
-  config = await setClient(config);
-  const client = await getRealClient(config);
-
-  let db: influx.InfluxDB | null = null;
-  if (config.influx) {
-    console.log('InfluxDB is enabled');
-    db = setupInflux(config);
-  }
+  config = await getClientConfig(config);
+  const client = await getClient(config);
+  const db = getDatabase(config);
 
   while (true) {
     try {

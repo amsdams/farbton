@@ -1,5 +1,6 @@
 # Farbton
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/7efbc14b733442bfb0bf26f5643bec72)](https://app.codacy.com/app/amsdams/farbton?utm_source=github.com&utm_medium=referral&utm_content=amsdams/farbton&utm_campaign=badger)
 [![CircleCI](https://circleci.com/gh/amsdams/farbton.svg?style=svg)](https://circleci.com/gh/amsdams/farbton)
 [![Build Status](https://travis-ci.org/amsdams/farbton.svg?branch=master)](https://travis-ci.org/amsdams/farbton)
 [![Run Status](https://api.shippable.com/projects/5b409da31e57690700751750/badge?branch=master)](https://app.shippable.com/github/amsdams/farbton)

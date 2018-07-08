@@ -1,7 +1,7 @@
-import * as huejay from 'huejay';
 import * as fs from 'fs';
-import * as moment from 'moment';
+import * as huejay from 'huejay';
 import * as influx from 'influx';
+import * as moment from 'moment';
 
 interface IConfig {
   username?: string;
@@ -23,15 +23,15 @@ async function saveLight(light: any, db: influx.InfluxDB) {
 
   await db.writePoints([
     {
-      measurement: 'light',
-      tags: {
-        light: light.name,
-      },
       fields: {
-        type: light.type,
         name: light.name,
         on: light.on ? 1 : 0,
         reachable: light.reachable ? 1 : 0,
+        type: light.type,
+      },
+      measurement: 'light',
+      tags: {
+        light: light.name,
       },
     },
   ]);
@@ -63,17 +63,18 @@ async function doLights(client: any, db: influx.InfluxDB | null) {
 async function saveSensor(sensor: any, db: influx.InfluxDB) {
   await db.writePoints([
     {
+      fields: {
+        lightlevel: sensor.state.attributes.attributes.lightlevel || 0,
+        name: sensor.name,
+        presence: sensor.state.attributes.attributes.presence ? 1 : 0,
+        temperature: sensor.state.attributes.attributes.temperature || 0,
+        type: sensor.type,
+      },
       measurement: 'sensor',
       tags: {
         sensor: sensor.name,
       },
-      fields: {
-        type: sensor.type,
-        name: sensor.name,
-        presence: sensor.state.attributes.attributes.presence ? 1 : 0,
-        temperature: sensor.state.attributes.attributes.temperature || 0,
-        lightlevel: sensor.state.attributes.attributes.lightlevel || 0,
-      },
+
     },
   ]);
 }
@@ -113,83 +114,96 @@ async function loop(client: any, db: influx.InfluxDB | null) {
   // let's find the lights
   doLights(client, db);
 }
+/* tslint:disable:no-big-function */
 function setupInflux(config: any): influx.InfluxDB {
   return new influx.InfluxDB({
-    host: config.influx.host,
     database: config.influx.database,
+    host: config.influx.host,
     schema: [
       {
-        measurement: 'light',
-        tags: ['light'],
         fields: {
-          type: influx.FieldType.STRING,
           name: influx.FieldType.STRING,
           on: influx.FieldType.INTEGER,
           reachable: influx.FieldType.INTEGER,
+          type: influx.FieldType.STRING,
         },
+        measurement: 'light',
+        tags: ['light'],
       },
       {
-        measurement: 'sensor',
-        tags: ['sensor'],
+
         fields: {
-          type: influx.FieldType.STRING,
+          lightlevel: influx.FieldType.INTEGER,
           name: influx.FieldType.STRING,
           presence: influx.FieldType.INTEGER,
           temperature: influx.FieldType.FLOAT,
-          lightlevel: influx.FieldType.INTEGER,
+          type: influx.FieldType.STRING,
         },
+        measurement: 'sensor',
+        tags: ['sensor'],
       },
     ],
   });
 }
-async function main() {
-  const config: IConfig = JSON.parse(fs.readFileSync('config.json').toString());
-
-  // find the bridge
-  if (!config.bridgeIp) {
-    const bridges = await huejay.discover();
-    if (bridges.length === 0) {
-      throw new Error('No bridges found');
-    }
-    for (const b of bridges) {
-      console.log(' + Found ' + b.id + ' at ' + b.ip);
-    }
-
-    const bridge = bridges[0];
-    console.log('Using bridge ' + bridge.id + ' at ' + bridge.ip);
-
-    config.bridgeIp = bridge.ip;
-  }
-
-  // get a new user if needed
-  if (!config.username) {
-    console.log('No username provided, trying to register a new one');
-
-    const cli = new huejay.Client({
-      host: config.bridgeIp,
-    });
-
-    const user = new cli.users.User();
-    user.deviceType = 'Farbton-ts';
-
-    const u = await cli.users.create(user);
-    console.log('New user is: ' + u.username);
-
-    config.username = u.username;
-  }
-
+/* tslint:enable:no-big-function */
+async function getRealClient(config: any) {
   // create the real client and check auth
   const client = new huejay.Client({
     host: config.bridgeIp,
     username: config.username,
   });
-
   console.log('Checking bridge auth ...');
   const authOk = await client.bridge.isAuthenticated();
   if (!authOk) {
     console.log('Not authenticated.');
     return;
   }
+  return client;
+}
+async function getDefaultBridge() {
+  const bridges = await huejay.discover();
+  if (bridges.length === 0) {
+    throw new Error('No bridges found');
+  }
+  for (const b of bridges) {
+    console.log(' + Found ' + b.id + ' at ' + b.ip);
+  }
+
+  const bridge = bridges[0];
+  console.log('Using bridge ' + bridge.id + ' at ' + bridge.ip);
+  return bridge;
+}
+async function getDefaultUser(config: any) {
+  console.log('No username provided, trying to register a new one');
+
+  const cli = new huejay.Client({
+    host: config.bridgeIp,
+  });
+
+  const user = new cli.users.User();
+  user.deviceType = 'Farbton-ts';
+
+  const u = await cli.users.create(user);
+  console.log('New user is: ' + u.username);
+  return u;
+}
+async function setClient(config: any) {
+  // find the bridge
+  if (!config.bridgeIp) {
+    const bridge = await getDefaultBridge();
+    config.bridgeIp = bridge.ip;
+  }
+  // get a new user if needed
+  if (!config.username) {
+    const user = await getDefaultUser(config);
+    config.username = user.username;
+  }
+  return config;
+}
+async function main() {
+  let config: IConfig = JSON.parse(fs.readFileSync('config.json').toString());
+  config = await setClient(config);
+  const client = await getRealClient(config);
 
   let db: influx.InfluxDB | null = null;
   if (config.influx) {

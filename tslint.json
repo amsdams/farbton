@@ -1,16 +1,10 @@
 {
   "extends": ["tslint:recommended", "tslint-sonarts", "tslint-eslint-rules"],
   "rules": {
-    "semicolon": [true, "always"],
-    "curly": [true],
     "quotemark": [true, "single", "jsx-double"],
-    "no-duplicate-variable": true,
     "no-console": false,
-    "no-debugger": true,
-
-     "ter-indent": [true, 2],
-     "object-literal-sort-keys": false,
-     "ordered-imports": false
+    "no-big-function": [true, 25],
+    "cognitive-complexity": [true, 11]
 
   }
 }

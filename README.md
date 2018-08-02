@@ -49,16 +49,16 @@ to obtain some nice plots.
 ```bash
 curl https://repos.influxdata.com/influxdb.key > ikey.key
 sudo apt-key add ikey.key
-echo "deb https://repos.influxdata.com/debian jessie stable" | sudo tee /etc/apt/sources.list.d/influxdb.list
-sudo apt-get install libfontconfig1
+
+echo "deb https://repos.influxdata.com/debian stretch stable" | sudo tee /etc/apt/sources.list.d/influxdb.list
+
 sudo apt-get update
 sudo apt-get install influxdb telegraf chronograf
 sudo service influxdb start
 sudo service telegraf start
 sudo service chronograf start
 
-wget --output-document=grafana_4.2.0-beta1_armhf.deb https://bintray.com/fg2it/deb/download_file?file_path=testing%2Fg%2Fgrafana_4.2.0-beta1_armhf.deb
-sudo dpkg -i grafana_4.2.0-beta1_armhf.deb
+sudo apt-get install grafana
 
 sudo systemctl enable grafana-server
 sudo systemctl start grafana-server
@@ -93,3 +93,4 @@ stderr_logfile_backups=10
 stderr_capture_maxbytes=1MB
 stderr_events_enabled=false
 ```
+

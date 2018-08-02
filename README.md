@@ -39,6 +39,12 @@ npm install && npm run-script compile
 node build/main.js
 ```
 
+## Install and run:
+
+```
+npm install && npm start
+```
+
 ## Addons
 
 ### Add InfluxDB, Grafana, Telegraf and Chronograf to Raspberry Pi
@@ -58,7 +64,8 @@ sudo service influxdb start
 sudo service telegraf start
 sudo service chronograf start
 
-sudo apt-get install grafana
+wget https://github.com/fg2it/grafana-on-raspberry/releases/download/v5.1.4/grafana_5.1.4_armhf.deb
+sudo dpkg -i grafana_5.1.4_armhf.deb 
 
 sudo systemctl enable grafana-server
 sudo systemctl start grafana-server

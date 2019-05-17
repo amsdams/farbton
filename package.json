@@ -14,7 +14,9 @@
     "compile": "tsc -p .",
     "test": "jest --no-cache",
     "coverage": "jest --no-cache --coverage && cat ./coverage/lcov.info | npx coveralls",
-    "cov": "jest --coverage --coverageReporters=text-lcov| coveralls"
+    "cov": "jest --coverage --coverageReporters=text-lcov| coveralls",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "repository": {
     "type": "git",
@@ -27,7 +29,8 @@
     "@types/node": "^10.5.2",
     "huejay": "latest",
     "influx": "latest",
-    "moment": "latest"
+    "moment": "latest",
+    "snyk": "^1.163.3"
   },
   "devDependencies": {
     "@types/core-js": "latest",
@@ -41,5 +44,6 @@
   },
   "jest": {
     "verbose": true
-  }
+  },
+  "snyk": true
 }

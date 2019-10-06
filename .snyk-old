@@ -1,0 +1,36 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.13.5
+ignore: {}
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  SNYK-JS-AXIOS-174505:
+    - huejay > axios:
+        patched: '2019-05-11T21:14:58.821Z'
+  SNYK-JS-LODASH-450202:
+    - snyk > snyk-nodejs-lockfile-parser > lodash:
+        patched: '2019-07-06T21:15:01.308Z'
+    - snyk > lodash:
+        patched: '2019-07-06T21:15:01.308Z'
+    - snyk > snyk-nuget-plugin > lodash:
+        patched: '2019-07-06T21:15:01.308Z'
+    - snyk > @snyk/dep-graph > lodash:
+        patched: '2019-07-06T21:15:01.308Z'
+    - snyk > inquirer > lodash:
+        patched: '2019-07-06T21:15:01.308Z'
+    - snyk > snyk-config > lodash:
+        patched: '2019-07-06T21:15:01.308Z'
+    - snyk > snyk-mvn-plugin > lodash:
+        patched: '2019-07-06T21:15:01.308Z'
+    - snyk > snyk-go-plugin > graphlib > lodash:
+        patched: '2019-07-06T21:15:01.308Z'
+    - snyk > snyk-nodejs-lockfile-parser > graphlib > lodash:
+        patched: '2019-07-06T21:15:01.308Z'
+    - snyk > snyk-php-plugin > @snyk/composer-lockfile-parser > lodash:
+        patched: '2019-07-06T21:15:01.308Z'
+    - snyk > @snyk/dep-graph > graphlib > lodash:
+        patched: '2019-07-06T21:15:01.308Z'
+  SNYK-JS-HTTPSPROXYAGENT-469131:
+    - snyk > proxy-agent > https-proxy-agent:
+        patched: '2019-10-05T21:15:33.352Z'
+    - snyk > proxy-agent > pac-proxy-agent > https-proxy-agent:
+        patched: '2019-10-05T21:15:33.352Z'

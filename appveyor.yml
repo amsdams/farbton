@@ -1,7 +1,7 @@
 version: 1.0.{build}
 image: Ubuntu
 init:
-- sh: nvm install 8.11.3
+- sh: nvm install 10.16.3
 install:
 - sh: npm i
 cache: node_modules

@@ -4,7 +4,7 @@ init:
 - sh: nvm install 8.11.3
 install:
 - sh: npm i
-cache: node_modules
+#cache: node_modules
 build_script:
 - sh: >-
     npm run lint

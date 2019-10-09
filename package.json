@@ -30,7 +30,7 @@
     "huejay": "latest",
     "influx": "latest",
     "moment": "latest",
-    "snyk": "^1.231.0"
+    "snyk": "^1.233.0"
   },
   "devDependencies": {
     "@types/core-js": "latest",
